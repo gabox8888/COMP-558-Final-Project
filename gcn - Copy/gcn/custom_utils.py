@@ -28,9 +28,9 @@ def load_labels(mask):
     masked_labels = []
     for i in mask:
         for j in range(100):
-            masked_labels.append(labels[i])
-    masked_labels = np.asarray(masked_labels)
-    masked_labels = np.reshape(masked_labels,(len(masked_labels),1))
+            temp = [1 if k == labels[i] else 0 for k in range(39)]
+            masked_labels.append(temp)
+    masked_labels = np.asarray(masked_labels,dtype='float32')
     return masked_labels
 
 
@@ -50,7 +50,7 @@ def gen_mask(size=26342,n=26342):
 
 
 def load_custom_data():
-    train_mask,val_mask,test_mask = gen_mask(size=100,n=26342)
+    train_mask,val_mask,test_mask = gen_mask(size=10000,n=26342)
     train_adj = generate_sparse_adj(train_mask)
     val_adj = generate_sparse_adj(val_mask)
     test_adj = generate_sparse_adj(test_mask)

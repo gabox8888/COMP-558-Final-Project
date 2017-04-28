@@ -153,6 +153,8 @@ class GCN(Model):
                                                   self.placeholders['labels_mask'])
 
     def _accuracy(self):
+        print("PREDS",self.outputs)
+        print('LABELS',self.placeholders['labels'])
         self.accuracy = masked_accuracy(self.outputs, self.placeholders['labels'],
                                         self.placeholders['labels_mask'])
 

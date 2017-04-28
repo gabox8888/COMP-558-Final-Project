@@ -9,9 +9,9 @@ from custom_utils import *
 from gcn.models import GCN, MLP
 
 # Set random seed
-seed = 123
-np.random.seed(seed)
-tf.set_random_seed(seed)
+# seed = 123
+# np.random.seed(seed)
+# tf.set_random_seed(seed)
 
 # Settings
 flags = tf.app.flags
@@ -79,7 +79,7 @@ sess = tf.Session()
 def evaluate(features, support, labels, mask, placeholders):
     t_test = time.time()
     feed_dict_val = construct_feed_dict(features, support, labels, mask, placeholders)
-    outs_val = sess.run([model.loss, model.accuracy], feed_dict=feed_dict_val)
+    outs_val = sess.run([model.loss, model.accuracy,model.predict()], feed_dict=feed_dict_val)
     return outs_val[0], outs_val[1], (time.time() - t_test)
 
 
@@ -88,9 +88,11 @@ sess.run(tf.global_variables_initializer())
 
 cost_val = []
 
-train_mask = np.asarray([1 if i%99 ==0 and i==0 else 0 for i in range(train_adj.shape[0])],dtype=np.bool)
-val_mask =  np.asarray([1 if i%99 ==0 and i==0 else 0 for i in range(val_adj.shape[0])],dtype=np.bool)
-test_mask =  np.asarray([1 if i%99 ==0 and i==0 else 0 for i in range(test_adj.shape[0])],dtype=np.bool)
+train_mask = np.asarray([1 if i%99 ==0 and i!=0 else 0 for i in range(train_adj.shape[0])],dtype=np.bool)
+val_mask =  np.asarray([1 if i%99 ==0 and i!=0 else 0 for i in range(val_adj.shape[0])],dtype=np.bool)
+test_mask =  np.asarray([1 if i%99 ==0 and i!=0 else 0 for i in range(test_adj.shape[0])],dtype=np.bool)
+
+print(support_train)
 
 # Train model
 for epoch in range(FLAGS.epochs):
@@ -100,8 +102,7 @@ for epoch in range(FLAGS.epochs):
     feed_dict = construct_feed_dict(features_train, support_train, train_labels, train_mask, placeholders)
     feed_dict.update({placeholders['dropout']: FLAGS.dropout})
     # Training step
-    outs = sess.run([model.opt_op, model.loss, model.accuracy], feed_dict=feed_dict)
-
+    outs = sess.run([model.opt_op, model.loss, model.accuracy,model.predict()], feed_dict=feed_dict)
     # Validation
     cost, acc, duration = evaluate(features_val, support_val, val_labels, val_mask, placeholders)
     cost_val.append(cost)

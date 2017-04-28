@@ -28,7 +28,7 @@ flags.DEFINE_integer('max_degree', 3, 'Maximum Chebyshev polynomial degree.')
 # Load data
 adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask = load_data(FLAGS.dataset)
 print('='*100)
-print(train_mask)
+print(y_train)
 print('='*100)
 
 
@@ -88,9 +88,10 @@ for epoch in range(FLAGS.epochs):
     feed_dict = construct_feed_dict(features, support, y_train, train_mask, placeholders)
     feed_dict.update({placeholders['dropout']: FLAGS.dropout})
 
-    print(support)
     # Training step
-    outs = sess.run([model.opt_op, model.loss, model.accuracy], feed_dict=feed_dict)
+    outs = sess.run([model.opt_op, model.loss, model.accuracy,model.predict()], feed_dict=feed_dict)
+    print(outs[3])
+
 
     # Validation
     cost, acc, duration = evaluate(features, support, y_val, val_mask, placeholders)
