@@ -161,19 +161,43 @@ class GCN(Model):
     def _build(self):
 
         self.layers.append(GraphConvolution(input_dim=self.input_dim,
-                                            output_dim=FLAGS.hidden1,
+                                            output_dim=1000,
                                             placeholders=self.placeholders,
                                             act=tf.nn.relu,
                                             dropout=True,
                                             sparse_inputs=True,
                                             logging=self.logging))
 
-        self.layers.append(GraphConvolution(input_dim=FLAGS.hidden1,
-                                            output_dim=self.output_dim,
+        self.layers.append(Dense(input_dim=1000,
+                                 output_dim=700,
+                                 placeholders=self.placeholders,
+                                 act=tf.nn.tanh,
+                                 dropout=True,
+                                 sparse_inputs=True,
+                                 logging=self.logging))
+
+        self.layers.append(GraphConvolution(input_dim=700,
+                                            output_dim=200,
                                             placeholders=self.placeholders,
                                             act=lambda x: x,
                                             dropout=True,
                                             logging=self.logging))
+        self.layers.append(Dense(input_dim=200,
+                                 output_dim=100,
+                                 placeholders=self.placeholders,
+                                 act=tf.nn.tanh,
+                                 dropout=True,
+                                 sparse_inputs=True,
+                                 logging=self.logging))
+
+         self.layers.append(Dense(input_dim=100,
+                                 output_dim=self.output_dim,
+                                 placeholders=self.placeholders,
+                                 act=tf.nn.relu,
+                                 dropout=True,
+                                 sparse_inputs=True,
+                                 logging=self.logging))
+
 
     def predict(self):
         return tf.nn.softmax(self.outputs)

@@ -5,8 +5,11 @@ def generate_sparse_adj(mask):
     size = len(mask)
     sparse = lil_matrix((size*100, size*100), dtype=np.int8)
     for i,x in enumerate(mask):
-        current = np.load('../../../../data/new_data/matrices/adjacency/a_{}.npy'.format(x))
-        current[:,99] = [1 for i in range(100)]
+        current = np.load('../../../../data/new_data/matrices/adjacency/a_{}.npy'.format(x))        
+        current[:,98] = [1 for i in range(100)]
+        transp = np.transpose(current)
+        current += transp
+        np.fill_diagonal(current, 1)
         current_sparse = lil_matrix(current)
         sparse[i*100:i*100+100,i*100:i*100+100] = current_sparse
     return sparse
@@ -35,12 +38,12 @@ def load_labels(mask):
 
 
 def gen_mask(size=26342,n=26342):
-    mask = np.random.randint(0,n,size)
+    mask = np.random.randint(1,n,size)
     np.random.shuffle(mask)
 
-    train_size = int(size*0.5)
-    val_size = int(size*0.3)
-    test_size = int(size*0.2)
+    train_size = int(size*0.7)
+    val_size = int(size*0.2)
+    test_size = int(size*0.1)
 
     train_mask = mask[:train_size]
     val_mask = mask[train_size:train_size + val_size]
@@ -50,7 +53,7 @@ def gen_mask(size=26342,n=26342):
 
 
 def load_custom_data():
-    train_mask,val_mask,test_mask = gen_mask(size=10000,n=26342)
+    train_mask,val_mask,test_mask = gen_mask(size=26342,n=26342)
     train_adj = generate_sparse_adj(train_mask)
     val_adj = generate_sparse_adj(val_mask)
     test_adj = generate_sparse_adj(test_mask)
